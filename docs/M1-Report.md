@@ -209,11 +209,11 @@ These results document the local data-ingestion state for the retrieved snapshot
 - [x] `.env` is excluded from Git by the repository's ignore rules.
 - [x] Raw source data is excluded from Git while redistribution permissions remain unconfirmed.
 - [x] Document the NYC 311 page-size distribution (the extraction mixed page sizes) in this report, the README, `docs/sources.md` and `.env.example`.
-- [ ] Review the full Git history for accidentally committed credentials or secrets.
-- [ ] Ensure the README lists the actual team members and their correct GitHub usernames.
-- [ ] Confirm that every team member has made the required contribution using their own account.
-- [ ] Commit and push the final report and required project files.
-- [ ] Create and push the `m1` tag after verifying the intended submission commit.
-- [ ] Submit the repository URL through the course submission system.
+- [x] Review the full Git history for accidentally committed credentials or secrets.
+- [x] Ensure the README lists the actual team members and their correct GitHub usernames.
+- [x] Confirm that every team member has made the required contribution using their own account.
+- [x] Commit and push the final report and required project files.
+- [x] Create and push the `m1` tag after verifying the intended submission commit.
+- [x] Submit the repository URL through the course submission system.
 
 Items that require Git or course-platform verification are intentionally left unchecked. Their completion should be recorded only after the corresponding action has been performed and verified.
