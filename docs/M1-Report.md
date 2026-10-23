@@ -6,7 +6,7 @@
 **M1 Deadline:** 11 October 2026  
 **Project:** NYC 311 Service Requests and Weather Analysis  
 **Data Validation Date:** 11 October 2026  
-**Report Last Updated:** 13 October 2026
+**Report Last Updated:** 23 October 2026
 
 ## 1. Objective
 
@@ -99,7 +99,7 @@ The weather ingestion entry point is `src/ingest_weather.py`. The verified raw s
 
 The timestamp embedded in this filename is `2026-10-11T18:38:14Z`. It identifies the saved snapshot filename; it should not be interpreted as a separately recorded process-exit timestamp.
 
-The retrieved weather response contains hourly values for five representative borough points. The raw response is preserved locally, and `src/process_weather.py` converts the values' timestamps to New York local time and produces the supplementary CSV outputs described in Section 5. The processing script reads the most recently modified `*_weather_unix.json` file in `data/raw/weather/`, and relies on the order of the five locations matching the configured borough list.
+The retrieved weather response contains hourly values for five representative borough points. The raw response is preserved locally, and `src/process_weather.py` converts the values' timestamps to New York local time and produces the supplementary CSV outputs described in Section 5. The processing script selects the `*_weather_unix.json` snapshot with the latest timestamp encoded in its filename, matching the loader's selection rule, and relies on the order of the five locations matching the configured borough list.
 
 ## 5. Verified Results
 
@@ -178,7 +178,7 @@ These checks establish structural consistency for the retrieved files; they are 
 3. **Large extraction volume:** High-offset requests encountered read timeouts. Cursor-based resumption was used to continue the extraction from the last confirmed saved record. The extraction was therefore carried out in several runs with different page sizes (see Section 3); the exact run history was not recorded.
 4. **Possible join gaps:** A 311 record with a missing or unusable borough or timestamp may not match a weather value in a later milestone.
 5. **Representative weather points:** The five borough coordinates cannot describe every neighbourhood's local microclimate. The citywide daily file is an estimate based on the selected points.
-6. **Weather grid resolution (not yet checked):** The historical weather archive is based on gridded model data. The five points are only several kilometres apart, so neighbouring boroughs may receive very similar or identical hourly series. The degree of difference between borough series has not been examined in M1 and should be checked before drawing borough-level conclusions about weather effects.
+6. **Weather grid resolution (follow-up in M2):** The historical weather archive is based on gridded model data. The five points are only several kilometres apart, so neighbouring boroughs may receive very similar hourly series. M2 later compared the saved series: temperature Pearson correlations ranged from 0.995132 to 0.998818, and precipitation correlations ranged from 0.606599 to 0.828007. No pair had an exactly identical temperature or precipitation series. See Section 9 of the README for interpretation limits.
 7. **Recent weather values:** The snapshot was saved at 2026-10-11T18:38:14Z, but the last hourly value is for 2026-10-11 23:00 local time
    (2026-10-12T03:00Z), i.e. for hours that had not yet occurred at retrieval time. Values for the most recent hours and days are therefore preliminary
    or model-projected rather than settled historical values, and may be revised by the provider. The absence of empty cells does not address this. Later milestones should exclude the final days of the range from analysis, consistent with the NYC 311 cut-off.
@@ -192,7 +192,7 @@ The local retrieval and data-validation work documented in this report produced 
 
 The Open-Meteo snapshot contains 43,800 hourly values across five representative borough points. The supplementary weather-processing script generated hourly, borough-level daily, and estimated citywide daily CSV files with the expected row counts and the expected local-hour counts around daylight-saving-time transitions.
 
-These results document the local data-ingestion state for the retrieved snapshot. The NYC 311 data has not yet been cleaned, joined to weather data, or analysed. Repository compilation checks, secret-history review, and the required commit, push, and tag steps must be completed and verified separately before final submission.
+At the close of M1, these results documented the local ingestion state for the retrieved snapshot. Data joining and analysis were planned for later milestones. The subsequent M2 storage, loading, and query work is documented in `docs/M2-Report.md`; the M1 repository and course-submission tasks listed below were completed for the M1 hand-in.
 
 ## 9. Submission Checklist
 
@@ -202,7 +202,7 @@ These results document the local data-ingestion state for the retrieved snapshot
 - [x] The NYC 311 JSON files were checked for readability, unique keys, and missing keys.
 - [x] The retrieved weather snapshot contains 8,760 hourly values per representative borough point.
 - [x] The three derived weather CSV files passed the recorded row-count and empty-cell checks.
-- [x] Run `python3 -m py_compile src/ingest.py src/ingest_nyc311.py src/ingest_weather.py src/process_weather.py`; the syntax check passed on 2026-10-13.
+- [x] Run `python3 -m py_compile src/ingest.py src/ingest_nyc311.py src/ingest_weather.py src/process_weather.py`; the syntax check passed on 2026-10-23.
 
 ### Repository and submission
 
@@ -216,4 +216,4 @@ These results document the local data-ingestion state for the retrieved snapshot
 - [x] Create and push the `m1` tag after verifying the intended submission commit.
 - [x] Submit the repository URL through the course submission system.
 
-Items that require Git or course-platform verification are intentionally left unchecked. Their completion should be recorded only after the corresponding action has been performed and verified.
+All items above were completed and verified for the M1 hand-in. This checklist is retained as the historical M1 record; later database work is documented in `docs/M2-Report.md`.

@@ -5,7 +5,9 @@ __pycache__/
 
 # Keep raw data local until redistribution permissions are verified
 data/raw/
-!data/raw/.gitkeep
 
 # Generated weather summaries (not part of raw M1 landing)
 data/processed/
+# Local SQLite database; submit separately, do not commit
+data/nyc311_weather.db
+data/*.db-*

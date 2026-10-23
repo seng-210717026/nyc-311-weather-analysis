@@ -1,0 +1,38 @@
+{
+  "agencies": {
+    "row_count": 16,
+    "sha256": "52a609a41f37100309e7d29dbfef46a47a29d4901b7665efe015435731007c2a"
+  },
+  "boroughs": {
+    "row_count": 6,
+    "sha256": "80862b2841c2a2ea10041e802d9e83d4ffdd838988207bff2ea24ba1b1ef8b2f"
+  },
+  "complaint_types": {
+    "row_count": 194,
+    "sha256": "975c8aa742477ba30d1eaaa77563c5674073e05d6027d4126f55e5da67b9f99f"
+  },
+  "request_statuses": {
+    "row_count": 7,
+    "sha256": "1ebe23395aad748f9f63c0a0e4004c51c9e114cc5a836f28307118fbe0e2453e"
+  },
+  "submission_channels": {
+    "row_count": 5,
+    "sha256": "a9f1dc76ec26c259c77e308f73d28827ec5fddc2a9dd9de5da910224afcbcbe3"
+  },
+  "weather_locations": {
+    "row_count": 5,
+    "sha256": "1486f26f020cca65cce622ef7fef4a28b00ae16306c186a01d5904cb41d0e393"
+  },
+  "service_requests": {
+    "row_count": 3953178,
+    "sha256": "0c8f372bbaf61373f08be5afba69cef261002cea705736bf02618a5e422b5d53"
+  },
+  "weather_observations": {
+    "row_count": 43800,
+    "sha256": "4f7cce9a91a0ea65ca6c237dc89747fed76257ca8f82662d122d240f059d5a4e"
+  },
+  "quarantine_records": {
+    "row_count": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

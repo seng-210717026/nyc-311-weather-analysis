@@ -1,0 +1,23 @@
+PASS: Schema executes repeatedly
+PASS: All required tables are STRICT
+PASS: Every table has retrieved_at
+PASS: Foreign-key enforcement is enabled
+PASS: Valid service request is accepted
+PASS: Duplicate natural key rejected
+PASS: NULL primary key rejected
+PASS: Wrong data type rejected
+PASS: Orphan event reference rejected
+PASS: Normalized timestamp cannot be NULL
+PASS: Ambiguous local time preserved without invented UTC
+PASS: Foreign-key integrity check
+PASS: Synthetic data loads successfully
+PASS: Loader preserves ambiguous DST timestamp without UTC
+PASS: Loader preserves nonexistent DST timestamp without UTC
+PASS: New complaint type dimension member is created
+PASS: Missing natural key is quarantined
+PASS: Idempotence (row counts and contents unchanged on second load)
+PASS: Injected weather value raises the expected LoadError
+PASS: Atomicity (row counts and contents unchanged after expected LoadError)
+PASS: Temporary database and fixture data cleaned up
+
+ALL CHECKS PASSED

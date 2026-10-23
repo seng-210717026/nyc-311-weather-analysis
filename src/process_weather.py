@@ -90,9 +90,10 @@ def write_csv(path, rows, columns):
     print(f"Saved: {path} ({len(rows):,} rows)")
 
 
+# Filename timestamps are sortable and match load.py snapshot selection.
 raw_files = sorted(
     RAW_DIR.glob("*_weather_unix.json"),
-    key=lambda p: p.stat().st_mtime,
+    key=lambda p: p.name,
 )
 
 if not raw_files:

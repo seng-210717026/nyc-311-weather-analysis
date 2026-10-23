@@ -1,0 +1,38 @@
+PASS: Schema executes repeatedly
+PASS: All required tables are STRICT
+PASS: Every table has retrieved_at
+PASS: Foreign-key enforcement is enabled
+PASS: Valid service request is accepted
+PASS: Duplicate natural key rejected
+PASS: NULL primary key rejected
+PASS: Wrong data type rejected
+PASS: Orphan event reference rejected
+PASS: Normalized timestamp cannot be NULL
+PASS: Ambiguous local time preserved without invented UTC
+PASS: Foreign-key integrity check
+PASS: Synthetic data loads successfully
+PASS: Loader preserves ambiguous DST timestamp without UTC
+PASS: Loader preserves nonexistent DST timestamp without UTC
+PASS: New complaint type dimension member is created
+PASS: Missing natural key is quarantined
+PASS: Idempotence (row counts and contents unchanged on second load)
+PASS: Injected weather value raises the expected LoadError
+Traceback (most recent call last):
+  File "/home/seymanur/projects/nyc-311-weather-analysis/src/checks.py", line 587, in <module>
+    run_checks()
+    ~~~~~~~~~~^^
+  File "/home/seymanur/projects/nyc-311-weather-analysis/src/checks.py", line 582, in run_checks
+    run_loader_checks()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/seymanur/projects/nyc-311-weather-analysis/src/checks.py", line 554, in run_loader_checks
+    require(
+    ~~~~~~~^
+        before_failure == after_failure,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "Table row counts or contents changed after a failed load; atomicity failed.",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/seymanur/projects/nyc-311-weather-analysis/src/checks.py", line 25, in require
+    raise AssertionError(message)
+AssertionError: Table row counts or contents changed after a failed load; atomicity failed.

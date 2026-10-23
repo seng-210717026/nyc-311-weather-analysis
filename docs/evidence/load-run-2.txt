@@ -1,0 +1,47 @@
+
+========== DATA LOAD SUMMARY ==========
+Database: /home/seymanur/projects/nyc-311-weather-analysis/data/nyc311_weather.db
+NYC JSON files discovered: 263
+NYC JSON files read: 263
+NYC records seen: 3,953,178
+Empty NYC pages: 0
+Valid service request UPSERT attempts: 3,953,178
+Quarantine candidates: 0
+Weather source files read: 1
+Weather source: weather/20261011T183814Z_weather_unix.json
+Weather retrieval timestamp: 2026-10-11T18:38:14.000000Z
+Weather observation UPSERT attempts: 43,800
+
+Table counts (before -> after; net new rows):
+  agencies: 16 -> 16 (+0)
+  boroughs: 6 -> 6 (+0)
+  complaint_types: 194 -> 194 (+0)
+  request_statuses: 7 -> 7 (+0)
+  submission_channels: 5 -> 5 (+0)
+  weather_locations: 5 -> 5 (+0)
+  service_requests: 3,953,178 -> 3,953,178 (+0)
+  weather_observations: 43,800 -> 43,800 (+0)
+  quarantine_records: 0 -> 0 (+0)
+
+New entity counts:
+  agencies: 0
+  boroughs: 0
+  complaint_types: 0
+  request_statuses: 0
+  submission_channels: 0
+  weather_locations: 0
+
+Timestamp status counts:
+  created_date: normalized=3,952,381, ambiguous_local_time=796, nonexistent_local_time=1
+  closed_date: normalized=3,773,095, ambiguous_local_time=757, nonexistent_local_time=12, missing=179,314
+  due_date: normalized=15,007, missing=3,938,171
+  resolution_action_updated_date: normalized=3,882,616, ambiguous_local_time=754, nonexistent_local_time=20, missing=69,788
+
+Transformations:
+  Numeric source strings converted: 15,484,998
+  Empty strings converted to NULL: 0
+  Missing location objects preserved as NULL: 82,051
+
+Foreign-key check: PASS
+Transaction committed successfully.
+========== END OF LOAD SUMMARY ==========

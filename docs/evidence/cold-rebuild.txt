@@ -1,0 +1,66 @@
+Final cold rebuild and real-database hash verification
+2026-10-23T23:38:12+03:00
+
+----- Load into a fresh empty database -----
+
+========== DATA LOAD SUMMARY ==========
+Database: /tmp/nyc311_weather_m2_cold_rebuild_final.db
+NYC JSON files discovered: 263
+NYC JSON files read: 263
+NYC records seen: 3,953,178
+Empty NYC pages: 0
+Valid service request UPSERT attempts: 3,953,178
+Quarantine candidates: 0
+Weather source files read: 1
+Weather source: weather/20261011T183814Z_weather_unix.json
+Weather retrieval timestamp: 2026-10-11T18:38:14.000000Z
+Weather observation UPSERT attempts: 43,800
+
+Table counts (before -> after; net new rows):
+  agencies: 0 -> 16 (+16)
+  boroughs: 0 -> 6 (+6)
+  complaint_types: 0 -> 194 (+194)
+  request_statuses: 0 -> 7 (+7)
+  submission_channels: 0 -> 5 (+5)
+  weather_locations: 0 -> 5 (+5)
+  service_requests: 0 -> 3,953,178 (+3,953,178)
+  weather_observations: 0 -> 43,800 (+43,800)
+  quarantine_records: 0 -> 0 (+0)
+
+New entity counts:
+  agencies: 16
+  boroughs: 6
+  complaint_types: 194
+  request_statuses: 7
+  submission_channels: 5
+  weather_locations: 5
+
+Timestamp status counts:
+  created_date: normalized=3,952,381, ambiguous_local_time=796, nonexistent_local_time=1
+  closed_date: normalized=3,773,095, ambiguous_local_time=757, nonexistent_local_time=12, missing=179,314
+  due_date: normalized=15,007, missing=3,938,171
+  resolution_action_updated_date: normalized=3,882,616, ambiguous_local_time=754, nonexistent_local_time=20, missing=69,788
+
+Transformations:
+  Numeric source strings converted: 15,484,998
+  Empty strings converted to NULL: 0
+  Missing location objects preserved as NULL: 82,051
+
+Foreign-key check: PASS
+Transaction committed successfully.
+========== END OF LOAD SUMMARY ==========
+
+----- Compare all nine table hashes -----
+PASS: Saved before/after snapshots match (9 tables).
+Hashing current database: /tmp/nyc311_weather_m2_cold_rebuild_final.db
+This scans the contents of every table and may take several minutes.
+PASS: agencies — 16 rows
+PASS: boroughs — 6 rows
+PASS: complaint_types — 194 rows
+PASS: quarantine_records — 0 rows
+PASS: request_statuses — 7 rows
+PASS: service_requests — 3,953,178 rows
+PASS: submission_channels — 5 rows
+PASS: weather_locations — 5 rows
+PASS: weather_observations — 43,800 rows
+ALL REAL-DATABASE HASH CHECKS PASSED

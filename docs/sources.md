@@ -2,7 +2,7 @@
 
 This document records the provenance, scope, access method, and known limitations of the two data sources used in the NYC 311 Service Requests and Weather Analysis project.
 
-**Last updated:** 2026-10-13 (data verification performed on 2026-10-11)
+**Last updated:** 2026-10-23 (source data verified on 2026-10-11; M2 database checks performed on 2026-10-23)
 
 ## Source 1: NYC 311 Service Requests
 
@@ -24,7 +24,7 @@ This document records the provenance, scope, access method, and known limitation
 - **api_count_query:** The API count query returned 3,953,178 records at validation time, matching the local record count.
 - **validation_status:** The local audit found 3,953,178 unique `unique_key` values, zero duplicate keys, zero records missing `unique_key`, and zero unreadable or invalid JSON files. These checks were run as local verification steps on 2026-10-11 and are not part of a repository script.
 - **record_meaning:** One record represents one NYC 311 service request. The field `unique_key` identifies a request. Individual JSON objects may omit fields whose values are null, and the published schema may change over time.
-- **join_key:** Borough plus `created_date` normalized to the local hour in `America/New_York`. This can be used to associate a request with the corresponding borough reference point and hourly weather value in a later milestone. Requests with missing or ambiguous borough values may not join cleanly. `created_date` has no timezone offset and is treated as local New York time; it must be localized, not converted from UTC. DST-ambiguous (2025-11-02 01:00–01:59) and nonexistent (2026-03-08 02:00–02:59) local hours must be handled explicitly when joining.
+- **join_key:** Borough plus `created_date` normalized to the local hour in `America/New_York`. This can be used to associate a request with the corresponding borough reference point and hourly weather value in a later milestone. Requests with a missing borough or borough `UNSPECIFIED` cannot match a representative weather location. Requests with ambiguous or nonexistent `created_date` local times also lack a normalized UTC instant for the hourly join. `created_date` has no timezone offset and is treated as local New York time; it must be localized, not converted from UTC. DST-ambiguous (2025-11-02 01:00–01:59) and nonexistent (2026-03-08 02:00–02:59) local hours must be handled explicitly when joining.
 - **first_retrieved:** `2026-10-11T12:34:09Z` — the run identifier (UTC) of the earliest raw page file retained in `data/raw/nyc311/` (`20261011T123409_616565Z_offset_0.json`). Any earlier test requests are not documented by a retained raw file.
 - **full_range_completed_at:** An exact UTC completion timestamp was not retained in the available verification notes. The completed local snapshot was verified on 2026-10-11.
 - **known_issues:**
@@ -66,12 +66,12 @@ This document records the provenance, scope, access method, and known limitation
 - **first_retrieved:** `2026-10-11T16:13:02Z` — the run identifier (UTC) of the earliest raw weather file retained in `data/raw/weather/` (`20261011T161302_789888Z_weather.json`, see `superseded_raw_file`). The snapshot actually used is the Unix-timestamp file listed above (`2026-10-11T18:38:14Z`).
 - **known_issues:**
   - The five coordinates are representative points, not a dense measurement network covering every neighbourhood. Weather at one point may not represent an entire borough.
-  - The historical archive is based on gridded model data, and the five points are only a few kilometres apart. Neighbouring boroughs may therefore receive very similar or identical hourly series. This has not been examined in M1 and should be checked before borough-level weather conclusions are drawn.
+  - The historical archive is based on gridded model data, and the five points are only a few kilometres apart. M2 later compared the saved series: temperature Pearson correlations ranged from 0.995132 to 0.998818, and precipitation correlations ranged from 0.606599 to 0.828007. No pair had an exactly identical temperature or precipitation series. See Section 9 of the README for interpretation limits.
   - The hourly values are modelled estimates, not direct station measurements.
   - The citywide daily summaries are estimates derived from the five selected points, not official citywide measurements.
   - Values for the most recent days are preliminary and may be revised by the provider. The last hourly value (2026-10-11 23:00 local) lies after the snapshot time (2026-10-11T18:38Z), so the final hours cannot be settled historical values.  
   - The processed output includes 25 local hourly values on 2025-11-02 and 23 on 2026-03-08 because of daylight-saving-time transitions.
-  - The daily `weather_code_mode` column picks an arbitrary value when several codes tie, and the mean wind direction is an unweighted circular mean.
+  - The daily `weather_code_mode` column picks the first-encountered value when several codes tie; the mean wind direction is an unweighted circular mean.
   - Structural checks do not eliminate uncertainty in the underlying weather data.
 
 ## Retrieval and Validation Notes
@@ -83,3 +83,88 @@ The NYC 311 count query and local record count both returned 3,953,178 records a
 The NYC 311 JSON files and raw Open-Meteo responses are retained locally and excluded from Git, because of their size and while redistribution terms for the NYC 311 data remain unconfirmed. The weather CSV files are derived local outputs, also excluded from Git, and can be regenerated from the raw weather snapshot using `src/process_weather.py`.
 
 Future runs should record the UTC time of any count query, the completion time of each extraction, and the request parameters alongside the raw files.
+
+
+## M2 Database Load and Validation
+
+### Database and loading method
+
+- **Database:** `data/nyc311_weather.db`
+- **Database engine:** SQLite with `STRICT` tables.
+- **Schema:** `sql/schema.sql`.
+- **Connection management:** `src/db.py`.
+- **Loader:** `src/load.py`.
+- **Automated checks:** `src/checks.py`.
+- **Input:** Existing JSON files under `data/raw/`; no API calls are made
+  during database loading.
+- **NYC 311 page files:** 263 JSON files were discovered and read.
+- **Weather source file:** `data/raw/weather/20261011T183814Z_weather_unix.json`.
+- **Weather snapshot timestamp:** `2026-10-11T18:38:14Z`, derived from
+  the raw filename.
+- **NYC 311 retrieval metadata:** The `retrieved_at` value is derived
+  from the UTC run timestamp embedded in each page filename. It describes
+  the retained extraction metadata, not the original creation time of a
+  service request.
+
+### Loaded table counts
+
+| Table | Rows |
+|---|---:|
+| `agencies` | 16 |
+| `boroughs` | 6 |
+| `complaint_types` | 194 |
+| `request_statuses` | 7 |
+| `submission_channels` | 5 |
+| `weather_locations` | 5 |
+| `service_requests` | 3,953,178 |
+| `weather_observations` | 43,800 |
+| `quarantine_records` | 0 |
+
+### Normalization and quality decisions
+
+NYC 311 source timestamps have no explicit timezone offset. They are
+interpreted as New York local time and converted to UTC only when the
+instant can be determined reliably. Source timestamp strings are retained.
+
+For `created_date`, 3,952,381 records have normalized UTC timestamps,
+796 have ambiguous local times, and 1 has a nonexistent local time.
+These 797 requests remain in `service_requests`; no arbitrary UTC
+timestamp was assigned to them.
+
+Other timestamp fields were also audited. The load reported 757 ambiguous
+and 12 nonexistent `closed_date` values, and 754 ambiguous and 20
+nonexistent `resolution_action_updated_date` values. Missing optional dates
+remain `NULL`; 3,938,171 records have no `due_date` value.
+
+The loader converted numeric source strings to numeric SQLite values where
+required. Missing coordinates were retained as `NULL`. In particular,
+82,051 records lacked latitude and longitude. The source borough value
+`UNSPECIFIED` is retained but has no corresponding representative weather
+location.
+
+### Validation results
+
+The following checks passed during local verification:
+
+- All nine schema tables were created as SQLite `STRICT` tables.
+- Every table has a `retrieved_at` field.
+- Foreign-key enforcement is enabled on connections.
+- SQLite `integrity_check` returned `ok`.
+- `PRAGMA foreign_key_check` reported zero violations.
+- The full load read all 3,953,178 NYC 311 records and 43,800 weather
+  observations.
+- No records were quarantined during the successful full load.
+- A second complete load left every table's row count unchanged.
+- Automated checks passed for duplicate keys, NULL keys, incorrect
+  SQLite types, orphan references, timestamp-status constraints,
+  idempotence, and rollback after an injected failure.
+- A cold rebuild from an empty temporary SQLite database inserted all
+  3,953,178 service requests and 43,800 weather observations, with zero
+  quarantine candidates and a passing foreign-key check.
+- The cold-rebuilt database's nine-table row counts and SHA-256 content
+  hashes matched the saved full-database after-state. The load and comparison
+  output is recorded in `docs/evidence/cold-rebuild.txt`.
+
+The persistent database is excluded from Git through `.gitignore` and
+must be submitted separately where required. Raw NYC 311 JSON files and
+raw weather responses remain excluded from Git.
