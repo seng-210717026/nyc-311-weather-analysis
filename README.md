@@ -109,35 +109,39 @@ nyc-311-weather-analysis/
 ├── data/
 │   ├── raw/                         # Local source snapshots; excluded from Git
 │   ├── processed/                   # Generated weather CSVs; excluded from Git
-│   └── nyc311_weather.db             # Generated SQLite database; excluded from Git
+│   ├── mappings/
+│   │   ├── category_alias_map.csv
+│   │   └── identity_alias_map.csv
+│   └── nyc311_weather.db            # Generated SQLite database; excluded from Git
 ├── docs/
-│   ├── evidence/
-│   │   ├── README.md
-│   │   ├── atomicity-mutation-test.txt
-│   │   ├── checks.txt
-│   │   ├── cold-rebuild.txt
-│   │   ├── load-run-1.txt
-│   │   ├── load-run-2.txt
-│   │   ├── load-run-real-idempotence.txt
-│   │   ├── real-db-state-after.json
-│   │   └── real-db-state-before.json
+│   ├── evidence/                    # M1, M2, and M3 test outputs
 │   ├── sources.md
 │   ├── M1-Report.md
-│   └── M2-Report.md
+│   ├── M2-Report.md
+│   ├── M3-Report.md
+│   └── cleaning_report.md
+├── notebooks/
+│   └── m3_profile.ipynb
 ├── scripts/
 │   └── verify_real_db_idempotence.py
 ├── sql/
 │   ├── schema.sql
+│   ├── clean_schema.sql
 │   └── queries/
 │       └── hourly_complaints_vs_weather.sql
 └── src/
-    ├── ingest.py                    # Pipeline entry point for the M1 source ingestion
-    ├── ingest_nyc311.py             # NYC 311 ingestion
-    ├── ingest_weather.py            # Open-Meteo ingestion
-    ├── process_weather.py           # Supplementary weather processing
-    ├── db.py                        # Shared SQLite connection helper
-    ├── load.py                      # M2 transactional database loader
-    └── checks.py                    # M2 schema, integrity, idempotence, and rollback checks
+    ├── ingest.py
+    ├── ingest_nyc311.py
+    ├── ingest_weather.py
+    ├── process_weather.py
+    ├── db.py
+    ├── load.py
+    ├── checks.py
+    ├── clean.py
+    ├── clean_config.py
+    ├── validate.py
+    ├── test_validate_failures.py
+    └── m3_integrity.py
 ```
 
 The tree shows the logical project layout. The raw files, generated CSVs, and database are local data products and are not committed to Git. The M2 loader requires the preserved M1 raw snapshots to be present locally; it does not download missing source data. The database is rebuilt with `src/load.py` and submitted separately when required.
@@ -474,3 +478,41 @@ The database is a local, reproducible product built from the landed raw files an
 
 - Şeyma Nur Demirkoparan — GitHub: `@seng-210717026`
 - Melike Aldemir — GitHub: `@se-210717019`
+
+## 13. Data Quality — M3
+
+Profiling found substantial gaps in request coordinates and date fields, 797 creation timestamps without a unique UTC instant, and chronological inconsistencies in event timestamps.
+Borough-specific IQR fences flagged 518 high-precipitation and 784 high-wind observations; these unusual but plausible values were retained.
+The cleaned layer preserves raw values, records cleaned values and explicit flags, and maintains the same 3,953,178 request rows and 43,800 weather rows as M2.
+All five STOP checks pass, while three WARN checks document source coverage and analytical limitations.
+
+Read the [M3 Milestone Report](docs/M3-Report.md) for the implementation and test summary, and the [detailed Cleaning Report](docs/cleaning_report.md) for the data-quality investigation.
+
+### Build and validate
+
+Run from the repository root after restoring the complete landed M1 raw snapshots:
+
+```bash
+python src/load.py
+python src/clean.py
+python src/validate.py
+```
+
+Additional STOP tests:
+
+```bash
+python src/validate.py --self-test
+python src/test_validate_failures.py
+```
+
+### M3 evidence
+
+- `docs/evidence/m3_clean_run_1.txt`
+- `docs/evidence/m3_clean_run_2.txt`
+- `docs/evidence/m3_validate_output.txt`
+- `docs/evidence/m3_self_test.txt`
+- `docs/evidence/m3_stop_failure_tests.txt`
+- `docs/evidence/m3_integrity_compare.txt`
+- `docs/evidence/m3_atomicity_test.txt`
+
+**Status: M3 — cleaned layer and quality report complete.**

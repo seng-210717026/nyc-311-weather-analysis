@@ -1,0 +1,12 @@
+M3 CLEANING ATOMIC ROLLBACK TEST
+
+A separate temporary SQLite database was used. The first clean.py run
+completed successfully. A trigger then injected an intentional failure
+during the next cleaning run. The process exited with code 1.
+
+A before/after snapshot comparison confirmed that all table data and schema
+definitions were unchanged. The previous clean layer was preserved by
+transaction rollback. The production database was not used for failure
+injection, and the temporary database was removed.
+
+RESULT: PASS — atomic rollback verified.

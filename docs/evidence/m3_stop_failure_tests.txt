@@ -1,0 +1,10 @@
+M3 STOP PROCESS EXIT-CODE TESTS
+---------------------------------------------------------------------------
+PASS: Service-request row-count STOP; exit code=1
+PASS: Weather-observation row-count STOP; exit code=1
+PASS: Foreign-key integrity STOP; exit code=1
+PASS: Service-request impossible-value STOP; exit code=1
+PASS: Weather impossible-value STOP; exit code=1
+---------------------------------------------------------------------------
+ALL FIVE STOP TESTS EXITED WITH CODE 1.
+Temporary test databases were removed.

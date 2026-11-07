@@ -1,0 +1,9 @@
+M3 STOP-CHECK SELF-TESTS
+-----------------------------------------------------------------
+PASS: Service-request row-count STOP correctly returned STOP
+PASS: Weather-observation row-count STOP correctly returned STOP
+PASS: Foreign-key STOP correctly returned STOP
+PASS: Service-request impossible-value STOP correctly returned STOP
+PASS: Weather impossible-value STOP correctly returned STOP
+
+ALL STOP-CHECK SELF-TESTS PASSED

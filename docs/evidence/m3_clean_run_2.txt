@@ -1,0 +1,32 @@
+Service requests processed: 500,000
+Service requests processed: 1,000,000
+Service requests processed: 1,500,000
+Service requests processed: 2,000,000
+Service requests processed: 2,500,000
+Service requests processed: 3,000,000
+Service requests processed: 3,500,000
+
+M3 CLEANING COMPLETED
+Service requests: 3,953,178
+Weather observations: 43,800
+Mapping rows loaded: category=0, identity=0
+Unmatched mapping entries: category=0, identity=0
+
+FLAG COUNTS
+service_requests_clean.closed_at_utc_flag: ambiguous_local_time=757, invalid_before_created=1,070, missing_not_reported=179,314, nonexistent_local_time=12, ok=3,772,025
+service_requests_clean.created_at_utc_flag: ambiguous_local_time=796, nonexistent_local_time=1, ok=3,952,381
+service_requests_clean.due_at_utc_flag: missing_not_reported=3,938,171, ok=15,007
+service_requests_clean.latitude_flag: missing_not_reported=82,051, ok=3,871,127
+service_requests_clean.longitude_flag: missing_not_reported=82,051, ok=3,871,127
+service_requests_clean.resolution_action_updated_at_utc_flag: ambiguous_local_time=754, invalid_before_created=82,407, missing_not_reported=69,788, nonexistent_local_time=20, ok=3,800,209
+weather_observations_clean.cloud_cover_pct_flag: ok=43,800
+weather_observations_clean.precipitation_mm_flag: ok=43,282, unusual_high=518
+weather_observations_clean.relative_humidity_2m_pct_flag: ok=43,800
+weather_observations_clean.temperature_2m_c_flag: ok=43,800
+weather_observations_clean.weather_code_flag: ok=43,800
+weather_observations_clean.wind_direction_10m_degrees_flag: ok=43,800
+weather_observations_clean.wind_speed_10m_kmh_flag: ok=43,016, unusual_high=784
+
+Foreign key check: PASS
+Raw M2 tables were not modified.
+Transaction committed.

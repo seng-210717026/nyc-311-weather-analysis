@@ -31,3 +31,15 @@ metadata may legitimately produce different hashes.
 ## Cold rebuild
 
 - `cold-rebuild.txt`: a full load into an empty temporary SQLite database. It recorded 3,953,178 service requests, 43,800 weather observations, zero quarantine candidates, a passing foreign-key check, and a successful commit. The verification script compared its table-content hashes with the saved full-database after-state. The temporary database was deleted after validation.
+
+
+## M3 Cleaning and Quality Evidence
+
+- `m3_clean_run_1.txt` and `m3_clean_run_2.txt`: final production clean runs.
+- `m3_validate_output.txt`: final live validator output.
+- `m3_self_test.txt`: function-level STOP self-tests.
+- `m3_stop_failure_tests.txt`: five separate process tests; all exited with code 1.
+- `m3_integrity_before.json` and `m3_integrity_compare.txt`: M2 source immutability and M3 idempotence evidence.
+- `m3_atomicity_test.txt`: temporary-database injected-failure rollback test.
+
+The production SQLite database and raw M1 files are excluded from Git. Submit the built database separately and include the raw-data ZIP if required by the course system.

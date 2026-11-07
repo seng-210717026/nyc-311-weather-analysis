@@ -1,0 +1,57 @@
+{
+  "description": "Baseline immediately before the final M3 clean.py run. M2 hashes prove source immutability during that run; M3 hashes are used for idempotence comparison.",
+  "tables": {
+    "agencies": {
+      "rows": 16,
+      "sha256": "97d9c7b82d92ddab25a937ab79d57616b058790bb1cb77edf595df7dd47e069f"
+    },
+    "boroughs": {
+      "rows": 6,
+      "sha256": "0a1e8cedb909369b495294fec9ce5a0cd8c9f9cbc16104e9d9a83800d22c0785"
+    },
+    "complaint_types": {
+      "rows": 194,
+      "sha256": "85346451adc821a436f2f7228caca984d15a7c3fcf1833257f6114348616dfae"
+    },
+    "request_statuses": {
+      "rows": 7,
+      "sha256": "1fbee4148665b75b9c7f7f88cd75ec458370abaa0176440530d89d8778db90c8"
+    },
+    "submission_channels": {
+      "rows": 5,
+      "sha256": "80661fe97874c379131fe78150a1772f5ca88e21b98a46f4bedbbd30cb989a16"
+    },
+    "weather_locations": {
+      "rows": 5,
+      "sha256": "de28f9e364273c812c249fee30577ac70811523bbc3142b25ec58c9f6b52541a"
+    },
+    "service_requests": {
+      "rows": 3953178,
+      "sha256": "f8b564a5d2613d537fc732c72eb931b0e45301c71a8be9af2870870dfa65e304"
+    },
+    "weather_observations": {
+      "rows": 43800,
+      "sha256": "f0a41efdcb037c66c848417664f5f1d694fd6d3acb274e4439afb67d47e7a610"
+    },
+    "quarantine_records": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "service_requests_clean": {
+      "rows": 3953178,
+      "sha256": "c1661229106c3494c3094fb099e6f1459580bbdc1934335340933be31f601b26"
+    },
+    "weather_observations_clean": {
+      "rows": 43800,
+      "sha256": "bc41d356497dba8987910cf1e5d98e9d7e180641c0c3128dfcae8998095339e3"
+    },
+    "category_alias_map": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "identity_alias_map": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

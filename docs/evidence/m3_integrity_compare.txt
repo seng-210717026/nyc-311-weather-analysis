@@ -1,0 +1,20 @@
+M2 SOURCE IMMUTABILITY
+---------------------------------------------------------------------------
+[PASS] agencies: 16 -> 16; hash_match=True
+[PASS] boroughs: 6 -> 6; hash_match=True
+[PASS] complaint_types: 194 -> 194; hash_match=True
+[PASS] request_statuses: 7 -> 7; hash_match=True
+[PASS] submission_channels: 5 -> 5; hash_match=True
+[PASS] weather_locations: 5 -> 5; hash_match=True
+[PASS] service_requests: 3,953,178 -> 3,953,178; hash_match=True
+[PASS] weather_observations: 43,800 -> 43,800; hash_match=True
+[PASS] quarantine_records: 0 -> 0; hash_match=True
+
+M3 IDEMPOTENCE
+---------------------------------------------------------------------------
+[PASS] service_requests_clean: 3,953,178 -> 3,953,178; hash_match=True
+[PASS] weather_observations_clean: 43,800 -> 43,800; hash_match=True
+[PASS] category_alias_map: 0 -> 0; hash_match=True
+[PASS] identity_alias_map: 0 -> 0; hash_match=True
+
+ALL M2 HASHES UNCHANGED; ALL M3 TABLES IDEMPOTENT.

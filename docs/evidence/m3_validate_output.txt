@@ -1,0 +1,13 @@
+M3 DATA QUALITY VALIDATION
+Database: /home/seymanur/projects/nyc-311-weather-analysis/data/nyc311_weather.db
+---------------------------------------------------------------------------
+[PASS] Service-request row count: raw=3,953,178; clean=3,953,178; equal=True
+[PASS] Weather-observation row count: raw=43,800; clean=43,800; equal=True
+[PASS] Foreign-key integrity: PRAGMA foreign_key_check returned zero rows
+[PASS] Service-request cleaned values: timestamps, chronology, raw-to-clean values and coordinate ranges are valid
+[PASS] Weather cleaned values: weather domains, raw-to-clean values and borough-specific IQR flags are valid
+[WARN] Coordinate missingness by borough: coordinate missingness exceeds 10% in: UNSPECIFIED: 93.08% (3,684/3,958)
+[WARN] Coverage freshness: latest date by borough: BRONX=2026-10-10 (29 days old); BROOKLYN=2026-10-10 (29 days old); MANHATTAN=2026-10-10 (29 days old); QUEENS=2026-10-10 (29 days old); STATEN ISLAND=2026-10-10 (29 days old); UNSPECIFIED=2026-10-09 (30 days old); freshness threshold=7 days; stale/missing: BRONX: 29 days old; BROOKLYN: 29 days old; MANHATTAN: 29 days old; QUEENS: 29 days old; STATEN ISLAND: 29 days old; UNSPECIFIED: 30 days old
+[WARN] Project-specific data limitations: UNSPECIFIED borough=3,958; unresolved creation UTC=797; missing due date=99.62% (3,938,171/3,953,178); these records/fields limit borough-hour weather joins or due-date analysis
+---------------------------------------------------------------------------
+VALIDATION PASSED: all STOP checks passed; WARN checks=3.
