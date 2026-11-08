@@ -481,10 +481,10 @@ The database is a local, reproducible product built from the landed raw files an
 
 ## 13. Data Quality — M3
 
-Profiling found substantial gaps in request coordinates and date fields, 797 creation timestamps without a unique UTC instant, and chronological inconsistencies in event timestamps.
+Profiling identified 82,051 requests with both coordinates missing. Of these, 3,684 (about 4.5%) are in the UNSPECIFIED group; the remaining 78,367 belong to the five named boroughs. The investigation also found 797 creation timestamps without a unique UTC instant and chronological inconsistencies in closed and resolution-update timestamps.
 Borough-specific IQR fences flagged 518 high-precipitation and 784 high-wind observations; these unusual but plausible values were retained.
 The cleaned layer preserves raw values, records cleaned values and explicit flags, and maintains the same 3,953,178 request rows and 43,800 weather rows as M2.
-All five STOP checks pass, while three WARN checks document source coverage and analytical limitations.
+All five STOP checks pass, while three WARN checks document source coverage and analytical limitations. On 8 November 2026, the latest request dates were 29 days old for the five named boroughs and 30 days old for UNSPECIFIED. Source lag at extraction was approximately 33 hours and 9 minutes; the stored snapshot was approximately 28 days old. These are distinct freshness measurements.
 
 Read the [M3 Milestone Report](docs/M3-Report.md) for the implementation and test summary, and the [detailed Cleaning Report](docs/cleaning_report.md) for the data-quality investigation.
 
@@ -493,16 +493,16 @@ Read the [M3 Milestone Report](docs/M3-Report.md) for the implementation and tes
 Run from the repository root after restoring the complete landed M1 raw snapshots:
 
 ```bash
-python src/load.py
-python src/clean.py
-python src/validate.py
+python3 src/load.py
+python3 src/clean.py
+python3 src/validate.py
 ```
 
 Additional STOP tests:
 
 ```bash
-python src/validate.py --self-test
-python src/test_validate_failures.py
+python3 src/validate.py --self-test
+python3 src/test_validate_failures.py
 ```
 
 ### M3 evidence

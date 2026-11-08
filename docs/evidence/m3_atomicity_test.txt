@@ -1,3 +1,5 @@
+NOTE: This file is a narrative summary of the executed atomicity test. The original raw terminal output and exact before/after hash values were not retained.
+
 M3 CLEANING ATOMIC ROLLBACK TEST
 
 A separate temporary SQLite database was used. The first clean.py run

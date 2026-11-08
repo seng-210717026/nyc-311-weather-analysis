@@ -1,7 +1,7 @@
-# M2 Validation Evidence
+# Project Validation Evidence — M1, M2, and M3
 
-These files record the local M2 validation runs for the saved NYC 311 and
-Open-Meteo source snapshots.
+These files record the local ingestion, database, and cleaning validation runs
+for the saved NYC 311 and Open-Meteo source snapshots.
 
 - `load-run-1.txt` and `load-run-2.txt`: the two recorded full loader runs.
   Both ran against an already populated database and showed +0 net new rows;

@@ -42,8 +42,8 @@ The M3 cleaning scope focuses on timestamps, coordinates, and the seven weather 
 | `src/test_validate_failures.py` | Tests that all five STOP conditions fail in separate temporary databases |
 | `src/m3_integrity.py` | Compares row counts and SHA-256 hashes for M2 and M3 tables |
 | `notebooks/m3_profile.ipynb` | Contains the profiling investigation and executed outputs |
-| `data/mappings/category_alias_map.csv` | Records approved category aliases; header-only in this snapshot |
-| `data/mappings/identity_alias_map.csv` | Records approved identity decisions; header-only in this snapshot |
+| `data/mappings/category_alias_map.csv` | Stores category mapping decisions; header-only in this snapshot |
+| `data/mappings/identity_alias_map.csv` | Stores identity mapping decisions; header-only in this snapshot |
 | `docs/M3-Report.md` | Milestone implementation, validation, and submission summary |
 | `docs/cleaning_report.md` | Detailed findings, issues register, missingness analysis, flags, thresholds, and limitations |
 | `docs/evidence/` | Stores final cleaning, validation, failure-test, rollback, and integrity evidence |
@@ -68,11 +68,12 @@ The profiling notebook examines all six required data-quality families.
 
 ### 4.1 Important Missingness Findings
 
-- Both latitude and longitude are missing in 82,051 requests. In the `UNSPECIFIED` borough group, 3,684 of 3,958 requests (93.08%) lack coordinates.
-- The closed timestamp is missing in 179,314 requests.
+- Both latitude and longitude are missing in 82,051 requests. Although 3,684 of 3,958 `UNSPECIFIED`-borough requests (93.08%) lack coordinates, this group accounts for only about 4.5% of all missing coordinate pairs. The remaining 78,367 missing pairs belong to requests assigned to named boroughs.
+- The closed timestamp is missing in 179,314 requests: 113,409 IN PROGRESS; 56,363 OPEN; 5,064 PENDING; 3,159 ASSIGNED; 1,275 STARTED; 29 UNSPECIFIED; and 15 CLOSED.
 - The due timestamp is missing in 3,938,171 requests (99.62%). All 15,007 populated due dates belong to DSNY / GRAFFITI requests.
 - The resolution-update timestamp is missing in 69,788 requests.
 - There are 797 creation timestamps without a uniquely resolvable UTC instant: 796 ambiguous local times and one nonexistent local time caused by daylight-saving transitions.
+- For optional event timestamps on these requests, an `ok` flag indicates successful normalization only; chronology relative to creation cannot be evaluated.
 
 The observed relationships between missingness and request status, borough, agency, and complaint type support some inferred MAR interpretations. They do not establish the source's business rules. The causes that cannot be demonstrated are explicitly marked unknown in the detailed cleaning report.
 
@@ -134,11 +135,13 @@ The final live validator reported five STOP checks as PASS and three WARN checks
 | STOP | Foreign-key integrity | PASS — no violations |
 | STOP | Service-request cleaned-value rules | PASS |
 | STOP | Weather cleaned-value rules | PASS |
-| WARN | Coordinate missingness by borough | 93.08% missing in UNSPECIFIED |
-| WARN | Coverage freshness | 29 days for named boroughs; 30 days for UNSPECIFIED |
+| WARN | Coordinate missingness by borough | 3,684 of 3,958 UNSPECIFIED requests (93.08%) lack coordinates; this is about 4.5% of all missing pairs. The remaining 78,367 pairs belong to named boroughs. |
+| WARN | Coverage freshness | Latest request dates are 29 days old for the five named boroughs and 30 days old for UNSPECIFIED, relative to 8 November 2026 in America/New_York. |
 | WARN | Project-specific limitations | 3,958 unspecified-borough requests, 797 unresolved creation UTC timestamps, and 99.62% missing due dates |
 
-The three WARN results describe source coverage and measurement limitations, not failures of the cleaning pipeline.
+The three WARN results describe source coverage and measurement limitations, not failures of the cleaning pipeline. The freshness check compares the latest request date with the validation date in `America/New_York`; it does not measure extraction lag or snapshot age.
+
+The latest request timestamp is `2026-10-10T07:03:53Z`, and the latest service-request retrieval timestamp is `2026-10-11T16:13:02.789888Z`. Their difference is approximately 33 hours and 9 minutes, representing source lag at extraction. The latest service-request retrieval timestamp is approximately 28 days old on 8 November 2026, representing the age of the stored snapshot. These are separate freshness measurements.
 
 ### 7.1 STOP Failure Demonstrations
 
@@ -158,13 +161,13 @@ All five tests returned exit code 1. Their temporary databases were removed afte
 
 Atomicity was tested using a separate temporary database. The first cleaning run completed successfully. A SQLite trigger then injected an intentional failure during the next run. The process exited with code 1.
 
-A before/after snapshot comparison confirmed that all table data and schema definitions were unchanged. The previous clean layer was preserved by transaction rollback. The production database was not used for failure injection. The test result is documented in `docs/evidence/m3_atomicity_test.txt`.
+A before/after snapshot comparison confirmed that all table data and schema definitions were unchanged. The previous clean layer was preserved by transaction rollback. The production database was not used for failure injection. The test result is documented in `docs/evidence/m3_atomicity_test.txt`. The saved evidence is a narrative summary; the original raw terminal output and exact before/after hash values were not retained.
 
 ### 7.3 Source Immutability and Idempotence
 
-All nine M2 tables retained identical row counts and SHA-256 content hashes. All four M3 tables also retained identical row counts and content hashes across the compared runs.
+All nine M2 tables retained identical row counts and SHA-256 content hashes. All four M3 SQLite tables—`service_requests_clean`, `weather_observations_clean`, `category_alias_map`, and `identity_alias_map`—also retained identical row counts and content hashes across the compared runs. The two mapping CSV input files remained header-only, so the two mapping tables contained zero rows.
 
-This verifies that the recorded cleaning run did not modify M2 source data and that rebuilding the M3 layer with the same inputs produced identical content.
+This verifies that the recorded cleaning run did not modify M2 source data and that rebuilding the M3 layer with the same inputs produced identical content. Only `weather_observations_clean` is dropped and recreated on each run. The other M3 tables use `CREATE TABLE IF NOT EXISTS`; changes to their definitions in `sql/clean_schema.sql` do not automatically alter existing tables.
 
 Final evidence is stored in `docs/evidence/`:
 
@@ -179,7 +182,7 @@ Final evidence is stored in `docs/evidence/`:
 
 The profiling investigation reviewed distinct category labels and fuzzy-similarity candidates. Similar spelling, punctuation, and pluralization were treated as proposals rather than proof of equivalence.
 
-No category alias or entity identity decision had sufficient evidence for approval. Consequently, both mapping CSV files contain their required headers but no data rows. The loader reported zero loaded and zero unmatched mapping entries. No surrogate IDs were merged or rewritten.
+No category alias or entity identity decision had sufficient evidence for approval. Consequently, both mapping CSV files contain their required headers but no data rows. The loader reported zero loaded and zero unmatched mapping entries. No surrogate IDs were merged or rewritten. Mapping tables are loaded and counted in M3 but are not applied to cleaned tables; approved aliases are intended to be applied through joins in M4. Unmatched mapping entries are reported but do not stop the cleaning run.
 
 Future mapping changes must be recorded in the corresponding CSV with `decided_by`, `decided_at`, and an evidence note.
 
@@ -212,9 +215,9 @@ M4 must preserve these exclusions and limitations explicitly. Any imputation or 
 - [x] M2 source hashes verified unchanged.
 - [x] M3 content idempotence verified.
 - [x] README and both M3 reports prepared.
-- [ ] Final M3 commit created and pushed to GitHub.
-- [ ] `m3` tag pushed to GitHub.
-- [ ] Built database and required raw-data archive submitted through the course system.
+- [x] Final M3 commit created and pushed to GitHub.
+- [x] `m3` tag pushed to GitHub.
+- [x] Built database and required raw-data archive submitted through the course system.
 
 ## 11. Submission
 

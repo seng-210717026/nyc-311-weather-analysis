@@ -414,7 +414,7 @@ def check_coverage_freshness(con):
     if not rows:
         return "STOP", "no borough has service-request coverage"
 
-    today = datetime.now(ZoneInfo("Europe/Istanbul")).date()
+    today = datetime.now(ZoneInfo("America/New_York")).date()
     warnings = []
     summaries = []
 
