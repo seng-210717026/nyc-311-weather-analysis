@@ -119,9 +119,12 @@ nyc-311-weather-analysis/
 │   ├── M1-Report.md
 │   ├── M2-Report.md
 │   ├── M3-Report.md
-│   └── cleaning_report.md
+│   ├── cleaning_report.md
+│   └── eda_report.md
+├── figures/                         # Written by notebooks/m4_eda.ipynb
 ├── notebooks/
-│   └── m3_profile.ipynb
+│   ├── m3_profile.ipynb
+│   └── m4_eda.ipynb
 ├── scripts/
 │   └── verify_real_db_idempotence.py
 ├── sql/
@@ -516,3 +519,30 @@ python3 src/test_validate_failures.py
 - `docs/evidence/m3_atomicity_test.txt`
 
 **Status: M3 — cleaned layer and quality report complete.**
+
+## 14. Exploration (M4)
+
+The M4 analysis uses 363 complete local dates (12 October 2025–9 October 2026) and the five named boroughs. Daily 311 volume is right-skewed, the local request profile peaks at 10:00, and weekday volume is higher than weekend volume (exploratory, post-hoc comparison; week-block bootstrap difference: 1,308 requests/day; 95% CI: 966–1,658). Snow-coded weather-hour share is positively associated with the `SNOW OR ICE` request share, but the result is exploratory and not causal. The full methods, limitations, findings register, and figures are in [`docs/eda_report.md`](docs/eda_report.md); the reproducible notebook is [`notebooks/m4_eda.ipynb`](notebooks/m4_eda.ipynb).
+
+![Snow/ice request share rises with the share of snow-coded weather hours (exploratory)](figures/snow_ice_share_vs_snow_hours.png)
+
+### Reproduce M4
+
+Run from the repository root after restoring the complete landed M1 raw snapshot:
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 src/load.py
+python3 src/clean.py
+python3 src/validate.py
+```
+
+Then execute the notebook:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace notebooks/m4_eda.ipynb
+```
+
+The notebook opens `data/nyc311_weather.db` in read-only mode and writes figures to `figures/`. All SQL values are bound with `?` parameters; the only text interpolated into SQL in `src/` is fixed table and column identifiers (quoted with `quote_identifier` or taken from constant lists), which cannot be bound as parameters. Commit the executed notebook outputs together with the report and figures.
+
+**Status:** M4 — exploratory analysis complete.
