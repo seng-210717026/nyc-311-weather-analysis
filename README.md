@@ -1,5 +1,16 @@
 # NYC 311 Service Requests and Weather Analysis
 
+## At a glance
+
+| Milestone | Stage | Status | Where |
+|---|---|---|---|
+| M1 | INGEST | Complete | §3–4, [`docs/M1-Report.md`](docs/M1-Report.md) |
+| M2 | STORE | Complete | §10, [`docs/M2-Report.md`](docs/M2-Report.md) |
+| M3 | CLEAN | Complete | §13, [`docs/M3-Report.md`](docs/M3-Report.md) |
+| M4 | EXPLORE | Complete | §14, [`docs/eda_report.md`](docs/eda_report.md) |
+
+**Contents:** 1 Project Overview · 2 Date Range and Variables · 3 Data Sources · 4 Verified Data Status · 5 Repository Structure · 6 Requirements · 7 Setup and Execution · 8 Validation and Join Strategy · 9 Known Limitations · 10 M2 Schema and Database Load · 11 Current Status · 12 Team · 13 Data Quality (M3) · 14 Exploration (M4)
+
 ## 1. Project Overview
 
 This project investigates whether the volume and types of New York City 311 service requests vary with local weather conditions, time of day, and day of the week.
@@ -287,6 +298,8 @@ loading error rolls back the data changes.
 
 The schema is defined in `sql/schema.sql`. Database connection management is implemented in `src/db.py`, the loader in `src/load.py`, and automated tests in `src/checks.py`. The more detailed source audit, design rationale, and milestone checklist are in [`docs/M2-Report.md`](docs/M2-Report.md).
 
+All SQL values in the project's Python code and notebooks are bound as parameters (`?` or named). The only text interpolated into SQL is fixed table and column identifiers (quoted with `quote_identifier` or taken from constant lists), which cannot be bound as parameters.
+
 ### 10.2 Entity relationship diagram
 
 ```mermaid
@@ -453,7 +466,7 @@ python -u src/load.py 2>&1 | tee docs/evidence/load-run-2.txt
 python -u src/checks.py 2>&1 | tee docs/evidence/checks.txt
 ```
 
-The commands above save run logs in `docs/evidence/`. If the course system requires separate uploads, copy the relevant log files from that folder to `~/M2-submission/`; the committed copies remain in the repository.
+The commands above save run logs in `docs/evidence/`, where the committed copies are kept.
 
 Run `python -u scripts/verify_real_db_idempotence.py` to compare the saved before/after states with the current local database. It scans all table contents and may take several minutes; it does not rerun the loader.
 
@@ -476,6 +489,10 @@ The cold-rebuild log records a full load into a newly created temporary SQLite d
 **M2 — STORE:** The relational schema, transactional loader, source-to-database transformations, content-based synthetic idempotence check, rollback check, and hourly complaint/weather query are implemented. The full local database contains 3,953,178 service requests and 43,800 weather observations, with zero quarantined records and a passing foreign-key check. The synthetic test script reports `ALL CHECKS PASSED`. A subsequent full reload left row counts and SHA-256 content hashes unchanged in all nine tables; the baseline, after-state, and reload log are retained in `docs/evidence/`. A cold rebuild from an empty temporary database also matched the saved after-state hashes for all nine tables; the load and comparison outputs are recorded in `docs/evidence/cold-rebuild.txt`.
 
 The database is a local, reproducible product built from the landed raw files and is intentionally excluded from Git. See [`docs/M2-Report.md`](docs/M2-Report.md) for the milestone design decisions and validation details.
+
+**M3 — CLEAN:** The cleaned layer preserves raw values, adds explicit quality flags, and keeps the same row counts as M2. All five STOP checks pass and three WARN checks document source coverage and analytical limitations. See Section 13 and [`docs/M3-Report.md`](docs/M3-Report.md).
+
+**M4 — EXPLORE:** The executed notebook, eight figures and the exploratory report are complete; findings are labelled exploratory. See Section 14 and [`docs/eda_report.md`](docs/eda_report.md).
 
 ## 12. Team
 
@@ -543,6 +560,6 @@ Then execute the notebook:
 jupyter nbconvert --to notebook --execute --inplace notebooks/m4_eda.ipynb
 ```
 
-The notebook opens `data/nyc311_weather.db` in read-only mode and writes figures to `figures/`. All SQL values are bound with `?` parameters; the only text interpolated into SQL in `src/` is fixed table and column identifiers (quoted with `quote_identifier` or taken from constant lists), which cannot be bound as parameters. Commit the executed notebook outputs together with the report and figures.
+The notebook opens `data/nyc311_weather.db` in read-only mode and writes figures to `figures/`.
 
 **Status:** M4 — exploratory analysis complete.
